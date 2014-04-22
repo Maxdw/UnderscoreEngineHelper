@@ -106,7 +106,7 @@ class UnderscoreEngineHelperTest extends CakeTestCase {
 	}
 	
 	/**
-	 * Tests loading the templates into a inline folder
+	 * Tests loading the templates into a javascript object
 	 *
 	 * @covers UnderscoreEngineHelper::loadTemplates
 	 * @return void
