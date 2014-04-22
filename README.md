@@ -31,8 +31,8 @@ Example result:
 
 ```
 window.jst = {};
-window.jst['test'] = 'template content';
-window.jst['subfolder/test'] = 'template content from a template under a subfolder of WWW_ROOT/templates';
+window.jst['test'] = _.template('template content');
+window.jst['subfolder/test'] = _.template('template content from a template under a subfolder of WWW_ROOT/templates');
 ```
 
 
