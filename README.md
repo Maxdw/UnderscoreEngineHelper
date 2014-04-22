@@ -2,7 +2,7 @@ UnderscoreEngineHelper
 ======================
 
 This CakePHP helper can help you generate some basic Underscore Javascript and
-can be useful loading small amount of your Underscore templates without requiring
+can be useful loading a small amount of your Underscore templates without requiring
 further AJAX requests in order to fetch your templates seperately.
 
 ----------
@@ -26,6 +26,15 @@ if($templates = $this->UnderscoreEngine->loadTemplates()) {
 	echo $this->Html->scriptBlock($templates);
 }
 ```
+
+Example result:
+
+```
+window.jst = {};
+window.jst['test'] = 'template content';
+window.jst['subfolder/test'] = 'template content from a template under a subfolder of WWW_ROOT/templates';
+```
+
 
 Installation
 ---------
