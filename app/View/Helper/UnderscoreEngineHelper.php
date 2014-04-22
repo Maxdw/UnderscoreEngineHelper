@@ -7,7 +7,8 @@ App::uses('Folder', 'Utility');
 /**
  * Underscore Engine Helper for JsHelper
  *
- * Provides Underscore specific Javascript for JsHelper.
+ * Provides Underscore specific JavaScript and
+ * Underscore template utilities.
  */
 class UnderscoreEngineHelper extends JqueryEngineHelper {
 	
@@ -21,37 +22,48 @@ class UnderscoreEngineHelper extends JqueryEngineHelper {
 	
 	/**
 	 * File extensions to parse as possible
-	 * underscore template files.
+	 * Underscore template files.
 	 *
 	 * @var array
 	 */
 	protected $_templateExtensions = array('html', 'jst');
 	
 	/**
-	 * Helper dependencies
+	 * Create an iteration over the current selection result.
 	 *
-	 * @var array
+	 * @param string $callback The function body you wish to apply during the iteration.
+	 * @return string completed iteration
 	 */
-	public $helpers = array('Html');
+	public function each($callback) {
+		return '_(' . $this->selection . ').forEach(function (element, index, list) {' . $callback . '});';
+	}
 	
 	/**
-	 * Sets the relative path from the webroot
-	 * to the folder where the template files are
-	 * stored and optionally provide extenions to
-	 * look for.
+	 * Plucks the provided propertyName from the elements of the current selection result.
+	 * Returns an array with all the values of the targeted property.
+	 *
+	 * @param string $propertyName The property you wish to pluck from the HTMLElements
+	 * @return string
+	 */
+	public function pluck($propertyName) {
+		return '_(' . $this->selection . ').pluck("' . $propertyName . '");';
+	}
+	
+	/**
+	 * Sets the relative path from the webroot to
+	 * the folder where the template files are stored.
 	 *
 	 * @param string $path
-	 * @param array $extensions
 	 * @return boolean
 	 */
-	public function setTemplateRoot($path, $extensions = array()) {
-		$extensions = array_map('is_string', $extensions);
+	public function setTemplateRoot($path) {
 		$path = ltrim($path, '/\\');
 		$root = WWW_ROOT . $path;
 		
 		$Folder	= new Folder($root);
 
 		if (!$Folder->path || !$Folder->inPath(WWW_ROOT)) {
+			$this->_templateRoot = null;
 			return false;
 		}
 		
@@ -60,9 +72,23 @@ class UnderscoreEngineHelper extends JqueryEngineHelper {
 	}
 	
 	/**
-	 * Loads the templates inline into the window object
-	 * under a object called 'jst', mapping paths
-	 * to the underscore templates.
+	 * Returns a clone of the currently configured
+	 * template root Folder instance.
+	 *
+	 * @return Folder|null
+	 */
+	public function getTemplateRoot() {
+		if (!$root = $this->_templateRoot) {
+			return null;
+		}
+		
+		return clone $root;
+	}
+	
+	/**
+	 * Loads the Underscore templates inline into the
+	 * window object under a object called 'jst', mapping
+	 * paths to the underscore templates.
 	 * 
 	 * @param string $path
 	 * @param boolean $evaluate scripts
@@ -70,13 +96,10 @@ class UnderscoreEngineHelper extends JqueryEngineHelper {
 	 * @return boolean|string
 	 */
 	public function loadTemplates($path = null, $evaluate = false, $includeExt = false) {
-		if (is_string($path) and !$this->setTemplateRoot($path)) {
+		if ($path && !$this->setTemplateRoot($path)) {
 			return false;
 		}
-		
-		$Folder = $this->_templateRoot;
-		
-		if (!$Folder || !$Folder->path || !file_exists($Folder->path)) {
+		if (!$Folder = $this->getTemplateRoot()) {
 			return false;
 		}
 		
@@ -114,11 +137,13 @@ class UnderscoreEngineHelper extends JqueryEngineHelper {
 			
 			if ($evaluate) {
 				ob_start();
+				// @codeCoverageIgnoreStart
 				include $File->path;
+				// @codeCoverageIgnoreEnd
 				$template = ob_get_clean();
 				$template = json_encode($template);
 			}
-			else if ($template = $File->read()) {
+			elseif ($template = $File->read()) {
 				$template = json_encode($template);
 			}
 			
