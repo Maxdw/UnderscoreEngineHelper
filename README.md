@@ -14,7 +14,7 @@ Organize your templates in a folder under your webroot `WWW_ROOT` and configure 
 helper in your view file to look for this folder.
 
 ```
-$this->Underscore->setTemplateRoot('templates');
+$this->Js->UnderscoreEngine->setTemplateRoot('templates');
 ```
 
 Then `loadTemplates` will scan the configured folder for all files with a `.html` or `.jst`
@@ -22,7 +22,7 @@ extension and will produce a object under `window.jst` containing all of the tem
 and their relative paths.
 
 ```
-if($templates = $this->UnderscoreEngine->loadTemplates()) {
+if($templates = $this->Js->UnderscoreEngine->loadTemplates()) {
 	echo $this->Html->scriptBlock($templates);
 }
 ```
